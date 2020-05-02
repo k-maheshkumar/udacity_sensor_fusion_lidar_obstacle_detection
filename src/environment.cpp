@@ -52,6 +52,13 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr &viewer)
     renderPointCloud(viewer, lidarData, "lidarData", Color(0.3, 0.5, 0.2));
 
     // TODO:: Create point processor
+
+    ProcessPointClouds<pcl::PointXYZ> *pointProcessor{new ProcessPointClouds<pcl::PointXYZ>()};
+
+    std::pair<typename pcl::PointCloud<pcl::PointXYZ>::Ptr, typename pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentedCloud = pointProcessor->SegmentPlane(lidarData, 100, 0.2);
+
+    renderPointCloud(viewer, segmentedCloud.first, "obstaclesCloud", Color(1, 0, 0));
+    renderPointCloud(viewer, segmentedCloud.second, "planeCloud", Color(0, 0, 1));
 }
 
 //setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
