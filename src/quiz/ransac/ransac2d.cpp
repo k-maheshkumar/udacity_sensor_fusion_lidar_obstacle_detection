@@ -58,14 +58,104 @@ pcl::visualization::PCLVisualizer::Ptr initScene()
     return viewer;
 }
 
+// reference: https://en.wikipedia.org/wiki/Random_sample_consensus
 std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol)
 {
-    std::unordered_set<int> inliersResult;
+    std::unordered_set<int> bestInliersResult;
     srand(time(NULL));
 
-    // TODO: Fill in this function
+    float x1 = 0;
+    float y1 = 0;
+
+    float x2 = 0;
+    float y2 = 0;
+
+    float bestError = 10000;
+
+    std::vector<float> bestModel;
+
+    /*
+    For variables x and y and coefficients A, B, and C, the general equation of a line is:
+        Ax+By+C=0
+    Given two points: point1 (x1, y1) and point2 (x2, y2), the line through point1 and point2 has the specific form:
+
+        (y1−y2)x+(x2−x1)y+(x1∗y2−x2∗y1)=0
+        
+    Line formula Ax + By + C = 0Ax+By+C=0
+    Distance d = |Ax+By+C|/sqrt(A^2+B^2)
+    */
+
+    // Randomly sample subset and fit line
+
+    // Measure distance between every point and fitted line
+    // If distance is smaller than threshold count it as inlier
+
+    // Return indicies of inliers from fitted line with most inliers
 
     // For max iterations
+    while (maxIterations--)
+    {
+        std::unordered_set<int> inliers;
+
+        int index = 0;
+
+        index = rand() % cloud->size();
+        pcl::PointXYZ point1 = cloud->at(index);
+        inliers.insert(index);
+
+        index = rand() % cloud->size();
+        pcl::PointXYZ point2 = cloud->at(rand() % cloud->size());
+        inliers.insert(index);
+
+        x1 = point1.x;
+        y1 = point1.y;
+
+        x2 = point2.x;
+        y2 = point2.y;
+
+        float A = y1 - y2;
+        float B = x2 - x1;
+        float C = x1 * y2 - x2 * y1;
+
+        float yError = 0;
+
+        std::vector<float> model{A, B, C};
+
+        int inliersThresh = 5;
+
+        for (int index = 0; index < cloud->size(); index++)
+        {
+            if (inliers.count(index))
+                continue;
+
+            pcl::PointXYZ point = cloud->at(index);
+            float x = point.x;
+            float y = point.y;
+
+            float distance = fabs(A * x + B * y + C) / sqrt(A * A + B * B);
+
+            yError += (y2 - y);
+
+            if (distance < distanceTol)
+            {
+                inliers.insert(index);
+            }
+        }
+        if (inliers.size() >= bestInliersResult.size())
+        {
+            float rmse = sqrt(yError * yError / cloud->size());
+
+            if (rmse < bestError)
+            {
+                bestModel = model;
+                bestError = rmse;
+                bestInliersResult = inliers;
+            }
+        }
+    }
+
+    return bestInliersResult;
+}
 
     // Randomly sample subset and fit line
 
