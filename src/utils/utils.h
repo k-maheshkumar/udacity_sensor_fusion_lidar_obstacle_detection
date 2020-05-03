@@ -72,7 +72,7 @@ void ransacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, f
         float C = k;
         float D = -(i * x1 + j * y1 + k * z1);
 
-        float zError = 0;
+        // float zError = 0;
 
         std::vector<float> model{A, B, C, D};
 
@@ -91,8 +91,8 @@ void ransacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, f
             float distance = fabs(A * x + B * y + C * z + D) / sqrt(A * A + B * B + C * C);
 
             // reference: https://stackoverflow.com/questions/59919008/calculate-root-mean-square-of-3d-deviation-after-surface-fitting-in-python
-            float zModel = -(((x - B) / A) * ((x - B) / A) + ((y - D) / C) * ((y - D) / C)) + 1;
-            zError += zModel - z;
+            // float zModel = -(((x - B) / A) * ((x - B) / A) + ((y - D) / C) * ((y - D) / C)) + 1;
+            // zError += zModel - z;
 
             if (distance < distanceTol)
             {
@@ -101,14 +101,15 @@ void ransacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, f
         }
         if (inliers.size() >= bestInliersResult.size())
         {
-            float rmse = sqrt(zError * zError / cloud->size());
+            // rmse is not used as it spoils RANSAC because of random generator
+            // float rmse = sqrt(zError * zError / cloud->size());
 
-            if (rmse < bestError)
-            {
-                bestModel = model;
-                bestError = rmse;
-                bestInliersResult = inliers;
-            }
+            // if (rmse < bestError)
+            // {
+            bestModel = model;
+            // bestError = rmse;
+            bestInliersResult = inliers;
+            // }
         }
     }
     std::copy(bestInliersResult.begin(), bestInliersResult.end(), std::back_inserter(planeInliers.indices));
