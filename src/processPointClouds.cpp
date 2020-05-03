@@ -63,16 +63,17 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     // to find inliers for the cloud.
     pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
     pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
-    pcl::SACSegmentation<PointT> seg;
 
-    seg.setOptimizeCoefficients(true);
-    seg.setModelType(pcl::SACMODEL_PLANE);
-    seg.setMethodType(pcl::SAC_RANSAC);
-    seg.setMaxIterations(maxIterations);
-    seg.setDistanceThreshold(distanceThreshold);
+    // pcl::SACSegmentation<PointT> seg;
+    // seg.setOptimizeCoefficients(true);
+    // seg.setModelType(pcl::SACMODEL_PLANE);
+    // seg.setMethodType(pcl::SAC_RANSAC);
+    // seg.setMaxIterations(maxIterations);
+    // seg.setDistanceThreshold(distanceThreshold);
+    // seg.setInputCloud(cloud);
+    // seg.segment(*inliers, *coefficients);
 
-    seg.setInputCloud(cloud);
-    seg.segment(*inliers, *coefficients);
+    ransacPlane<PointT>(cloud, maxIterations, distanceThreshold, *inliers, *coefficients);
 
     if (inliers->indices.size() == 0)
     {
