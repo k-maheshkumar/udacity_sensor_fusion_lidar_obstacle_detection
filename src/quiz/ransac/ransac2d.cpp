@@ -302,14 +302,15 @@ std::unordered_set<int> RansacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, i
         }
         if (inliers.size() >= bestInliersResult.size())
         {
-            float rmse = sqrt(summedZErrorSquare / cloud->size());
+            // float rmse = sqrt(summedZErrorSquare / cloud->size());
 
-            if (rmse < bestError)
-            {
-                bestModel = model;
-                bestError = rmse;
-                bestInliersResult = inliers;
-            }
+            // if (rmse < bestError)
+            // {
+            //     bestModel = model;
+            //     bestError = rmse;
+            //     bestInliersResult = inliers;
+            // }
+            bestInliersResult = inliers;
         }
     }
 
