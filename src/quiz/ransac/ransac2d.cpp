@@ -81,7 +81,7 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
         (y1−y2)x+(x2−x1)y+(x1∗y2−x2∗y1)=0
         
-    Line formula Ax + By + C = 0Ax+By+C=0
+    Line formula Ax + By + C =0
     Distance d = |Ax+By+C|/sqrt(A^2+B^2)
     */
 
@@ -117,7 +117,7 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
         float B = x2 - x1;
         float C = x1 * y2 - x2 * y1;
 
-        float yError = 0;
+        float summedYErrorSquare = 0;
 
         std::vector<float> model{A, B, C};
 
@@ -134,7 +134,9 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
             float distance = fabs(A * x + B * y + C) / sqrt(A * A + B * B);
 
-            yError += (y2 - y);
+            float yModel = (-(A / B) * x) - (C / B);
+
+            summedYErrorSquare += (yModel - y) * (yModel - y);
 
             if (distance < distanceTol)
             {
@@ -143,7 +145,7 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
         }
         if (inliers.size() >= bestInliersResult.size())
         {
-            float rmse = sqrt(yError * yError / cloud->size());
+            float rmse = sqrt(summedYErrorSquare / cloud->size());
 
             if (rmse < bestError)
             {
@@ -216,7 +218,7 @@ std::unordered_set<int> RansacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, i
 
     Distance between point and plane
         If the plane is
-            Ax + By + Cz + D = 0,Ax+By+Cz+D=0,
+            Ax + By + Cz + D = 0,
         then given a point (x,y,z)(x,y,z), the distance from the point to the plane is:
             d = |A*x+B*y+C*z+D|/sqrt(A^2+B^2+C^2)
     */
@@ -268,7 +270,7 @@ std::unordered_set<int> RansacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, i
         float C = k;
         float D = -(i * x1 + j * y1 + k * z1);
 
-        float zError = 0;
+        float summedZErrorSquare = 0;
 
         std::vector<float> model{A, B, C, D};
 
@@ -287,10 +289,11 @@ std::unordered_set<int> RansacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, i
             float distance = fabs(A * x + B * y + C * z + D) / sqrt(A * A + B * B + C * C);
 
             // reference: https://stackoverflow.com/questions/59919008/calculate-root-mean-square-of-3d-deviation-after-surface-fitting-in-python
+            // float zModel = -(((x - B) / A) * ((x - B) / A) + ((y - D) / C) * ((y - D) / C)) + 1;
 
-            float zModel = -(((x - B) / A) * ((x - B) / A) + ((y - D) / C) * ((y - D) / C)) + 1;
+            float zModel = z = -(A / B) * x - (B / C) * y - (D / C);
 
-            zError += zModel - z;
+            summedZErrorSquare += (zModel - z) * (zModel - z);
 
             if (distance < distanceTol)
             {
@@ -299,7 +302,7 @@ std::unordered_set<int> RansacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, i
         }
         if (inliers.size() >= bestInliersResult.size())
         {
-            float rmse = sqrt(zError * zError / cloud->size());
+            float rmse = sqrt(summedZErrorSquare / cloud->size());
 
             if (rmse < bestError)
             {
