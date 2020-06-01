@@ -9,7 +9,7 @@
 #include <pcl/ModelCoefficients.h>
 
 template <typename PointT>
-void ransacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol, pcl::PointIndices &planeInliers, pcl::ModelCoefficients &modelCoeff)
+void ransacPlane(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTol, pcl::PointIndices &planeInliers, pcl::ModelCoefficients &modelCoeff)
 {
     std::cout << "using custom RANSAC implementation" << std::endl;
 
@@ -40,15 +40,15 @@ void ransacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, f
         int index = 0;
 
         index = rand() % cloud->size();
-        pcl::PointXYZ point1 = cloud->at(index);
+        PointT point1 = cloud->at(index);
         inliers.insert(index);
 
         index = rand() % cloud->size();
-        pcl::PointXYZ point2 = cloud->at(rand() % cloud->size());
+        PointT point2 = cloud->at(rand() % cloud->size());
         inliers.insert(index);
 
         index = rand() % cloud->size();
-        pcl::PointXYZ point3 = cloud->at(rand() % cloud->size());
+        PointT point3 = cloud->at(rand() % cloud->size());
         inliers.insert(index);
 
         x1 = point1.x;
@@ -83,7 +83,7 @@ void ransacPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, f
             if (inliers.count(index))
                 continue;
 
-            pcl::PointXYZ point = cloud->at(index);
+            PointT point = cloud->at(index);
             float x = point.x;
             float y = point.y;
             float z = point.z;
