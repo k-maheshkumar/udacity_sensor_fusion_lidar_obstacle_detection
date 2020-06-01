@@ -1,6 +1,9 @@
 /* \author Aaron Brown */
 // Quiz on implementing kd tree
 
+#ifndef KDTREE_H
+#define KDTREE_H
+
 #include "../../render/render.h"
 
 // Structure to represent node of kd tree
@@ -67,8 +70,7 @@ struct KdTree
         float y2 = target[1];
         float z2 = target[2];
 
-        // bool inRange = (fabs(x1 - x2) <= distanceTol) && (fabs(y1 - y2) <= distanceTol);
-        bool inRange = x1 > x2 - distanceTol && x1 < x2 + distanceTol && y1 > y2 - distanceTol && y1 < y2 + distanceTol && z1 > z2 - distanceTol && z1 < z2 + distanceTol;
+        bool inRange = (fabs(x1 - x2) <= distanceTol) && (fabs(y1 - y2) <= distanceTol);
 
         if (inRange)
         {
@@ -93,3 +95,4 @@ struct KdTree
         return ids;
     }
 };
+#endif /* KDTREE_H */
