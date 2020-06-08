@@ -94,12 +94,12 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr &viewer, ProcessPointCloud
 
     ProcessPointClouds<pcl::PointXYZI> *pointProcessor{new ProcessPointClouds<pcl::PointXYZI>()};
 
-    std::pair<typename pcl::PointCloud<pcl::PointXYZI>::Ptr, typename pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentedCloud = pointProcessor->SegmentPlane(filterCloud, 100, 0.2);
+    std::pair<typename pcl::PointCloud<pcl::PointXYZI>::Ptr, typename pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentedCloud = pointProcessor->SegmentPlane(filterCloud, 25, 0.2);
 
     renderPointCloud(viewer, segmentedCloud.first, "obstaclesCloud", Color(1, 0, 0));
     renderPointCloud(viewer, segmentedCloud.second, "planeCloud", Color(0, 0, 1));
 
-    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor->Clustering(segmentedCloud.first, 0.5, 30, 1775);
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor->Clustering(segmentedCloud.first, 0.4, 30, 1775);
 
     int clusterId = 0;
     std::vector<Color> colors = {Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1)};
