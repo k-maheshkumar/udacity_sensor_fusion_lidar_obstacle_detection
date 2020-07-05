@@ -20,6 +20,8 @@ template <typename PointT>
 typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float filterRes, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
 {
 
+    typename pcl::PointCloud<PointT>::Ptr filteredCloud{new pcl::PointCloud<PointT>()};
+    
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
 
@@ -29,20 +31,20 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     pcl::VoxelGrid<PointT> sor;
     sor.setInputCloud(cloud);
     sor.setLeafSize(filterRes, filterRes, filterRes);
-    sor.filter(*cloud);
+    sor.filter(*filteredCloud);
 
     pcl::CropBox<PointT> cropBox;
 
     cropBox.setMin(minPoint);
     cropBox.setMax(maxPoint);
-    cropBox.setInputCloud(cloud);
-    cropBox.filter(*cloud);
+    cropBox.setInputCloud(filteredCloud);
+    cropBox.filter(*filteredCloud);
 
     pcl::CropBox<PointT> egoVehicleRoof(true);
 
     egoVehicleRoof.setMin(Eigen::Vector4f(-1.5, -1.7, -1.0, 1.0));
     egoVehicleRoof.setMax(Eigen::Vector4f(2.6, 1.7, -0.4, 1.0));
-    egoVehicleRoof.setInputCloud(cloud);
+    egoVehicleRoof.setInputCloud(filteredCloud);
 
     std::vector<int> inlierIndices;
     egoVehicleRoof.filter(inlierIndices);
@@ -56,16 +58,16 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
 
     pcl::ExtractIndices<PointT> extractedIndices;
 
-    extractedIndices.setInputCloud(cloud);
+    extractedIndices.setInputCloud(filteredCloud);
     extractedIndices.setIndices(inliers);
     extractedIndices.setNegative(true);
-    extractedIndices.filter(*cloud);
+    extractedIndices.filter(*filteredCloud);
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloud;
+    return filteredCloud;
 }
 
 template <typename PointT>
